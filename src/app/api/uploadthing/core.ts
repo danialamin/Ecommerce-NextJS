@@ -1,6 +1,8 @@
+import { Metadata } from "next";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
-import { UploadThingError } from "uploadthing/server";
 import {z} from "zod"
+import sharp from "sharp"
+import { db } from "@/db";
  
 const f = createUploadthing();
  
@@ -9,12 +11,40 @@ const auth = (req: Request) => ({ id: "fakeId" });
 export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB" } })
     .input(z.object({ configId: z.string().optional() }))
-    .middleware(async ({ input }) => {
+    .middleware(async ({ input }: {input: any}) => {
       return ({ input })
     })
-    .onUploadComplete(async ({ metadata, file }) => {
+    .onUploadComplete(async ({ metadata, file }: {metadata: any, file: any}) => {
       const { configId } = metadata.input
-      return { name: 'john' };
+
+      const res = await fetch(file.url)
+      const buffer = await res.arrayBuffer()
+
+      const imgMetadata = await sharp(buffer).metadata()
+      const { width, height } = imgMetadata
+
+      if (!configId) {
+        const configuration = await db.configuration.create({
+          data: {
+            imageUrl: file.url,
+            height,
+            width
+          }
+        })
+        return { configId: configuration.id }
+      } else {
+        const updatedConfiguration = await db.configuration.update({
+          where: {
+            id: configId
+          },
+          data: {
+            croppedImageUrl: file.url
+          }
+        })
+
+        return { configId: updatedConfiguration.id }
+      }
+      
     }),
 } satisfies FileRouter;
  
