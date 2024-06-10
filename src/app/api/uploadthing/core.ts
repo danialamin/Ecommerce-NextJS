@@ -23,7 +23,7 @@ export const ourFileRouter = {
       const imgMetadata = await sharp(buffer).metadata()
       const { width, height } = imgMetadata
 
-      if (!configId) {
+      if (!configId && typeof height == 'number' && typeof width == 'number') {    // second and third conditions are just for typescript, so ignore them
         const configuration = await db.configuration.create({
           data: {
             imageUrl: file.url,
