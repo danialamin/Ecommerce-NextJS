@@ -1,4 +1,5 @@
 import DesignPreview from "@/components/DesignPreview"
+import { PrismaClient } from "@prisma/client"
 import { db } from "@/db"
 import { notFound } from "next/navigation"
 
@@ -24,8 +25,9 @@ const page = async ({searchParams}: searchParams) => {
   if (!configuration) {
     return notFound()
   }
+
   return (
-    <DesignPreview />
+    <DesignPreview configuration={configuration} />
   )
 }
 

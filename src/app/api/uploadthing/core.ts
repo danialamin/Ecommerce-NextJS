@@ -3,11 +3,12 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import {z} from "zod"
 import sharp from "sharp"
 import { db } from "@/db";
+import { PrismaClient } from "@prisma/client";
  
 const f = createUploadthing();
  
 const auth = (req: Request) => ({ id: "fakeId" });
- 
+
 export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: "4MB" } })
     .input(z.object({ configId: z.string().optional() }))
