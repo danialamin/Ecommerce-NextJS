@@ -23,7 +23,7 @@ const DesignPreview = ({configuration}: {configuration: configurationType}) => {
         return obj['label']
       }
   })
-  
+  // danial
   return (
     <>
       <div className='pointer-events-none select-none absolute inset-0 overflow-hidden flex justify-center'>
